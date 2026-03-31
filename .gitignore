@@ -13,6 +13,10 @@ backend/target/
 frontend/node_modules/
 frontend/dist/
 
+# npm cache
+.npm-cache/
+frontend/.npm-cache/
+
 # Logs
 *.log
 
@@ -22,3 +26,10 @@ frontend/dist/
 
 # Local docker data
 postgres_data/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Generated vite config outputs
+frontend/vite.config.js
+frontend/vite.config.d.ts

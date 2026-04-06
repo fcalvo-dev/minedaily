@@ -2,9 +2,9 @@
 
 Basado en:
 
-- `docs/01-product-rules-v3-3-lives.md`
-- `docs/02-domain-model-v2-3-lives.md`
-- `docs/03-api-contract-v2-integrated.md`
+- `docs/01-product-rules.md`
+- `docs/02-domain-model.md`
+- `docs/03-api-contract.md`
 
 ## 1. Propósito
 

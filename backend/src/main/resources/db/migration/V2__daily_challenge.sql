@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS daily_challenge (
+    id BIGSERIAL PRIMARY KEY,
+    challenge_id VARCHAR(64) NOT NULL UNIQUE,
+    challenge_date DATE NOT NULL UNIQUE,
+    window_start_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    window_end_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    rollover_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    timezone VARCHAR(64) NOT NULL,
+    rows INTEGER NOT NULL,
+    cols INTEGER NOT NULL,
+    mine_count INTEGER NOT NULL,
+    internal_seed BIGINT NOT NULL,
+    generator_version VARCHAR(32) NOT NULL,
+    board_fingerprint VARCHAR(64) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_daily_challenge_rows_positive CHECK (rows > 0),
+    CONSTRAINT chk_daily_challenge_cols_positive CHECK (cols > 0),
+    CONSTRAINT chk_daily_challenge_mines_positive CHECK (mine_count > 0),
+    CONSTRAINT chk_daily_challenge_mines_fit CHECK (mine_count < (rows * cols))
+);

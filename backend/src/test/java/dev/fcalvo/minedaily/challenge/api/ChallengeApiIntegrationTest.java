@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.fcalvo.minedaily.challenge.infrastructure.DailyChallengeRepository;
+import dev.fcalvo.minedaily.session.infrastructure.GameSessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,12 @@ class ChallengeApiIntegrationTest {
 	@Autowired
 	private DailyChallengeRepository dailyChallengeRepository;
 
+	@Autowired
+	private GameSessionRepository gameSessionRepository;
+
 	@BeforeEach
 	void setUp() {
+		gameSessionRepository.deleteAll();
 		dailyChallengeRepository.deleteAll();
 	}
 

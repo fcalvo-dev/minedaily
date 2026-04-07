@@ -1,7 +1,9 @@
 package dev.fcalvo.minedaily.session.config;
 
+import dev.fcalvo.minedaily.session.api.dto.CurrentUserChallengeStatusView;
 import dev.fcalvo.minedaily.session.api.dto.GameSessionView;
 import dev.fcalvo.minedaily.session.api.dto.SessionActionResponse;
+import dev.fcalvo.minedaily.session.application.CurrentUserChallengeStatus;
 import dev.fcalvo.minedaily.session.application.SessionActionResult;
 import dev.fcalvo.minedaily.session.domain.BoardCellSnapshot;
 import dev.fcalvo.minedaily.session.domain.BoardSnapshot;
@@ -27,6 +29,26 @@ public final class SessionApiMapper {
 			new GameSessionView.LivesView(session.getMaxLives(), session.getRemainingLives()),
 			new GameSessionView.PerformanceView(session.getErrorCount(), session.getClickCount()),
 			toBoardSnapshotView(session.getBoardSnapshot())
+		);
+	}
+
+	public static CurrentUserChallengeStatusView toCurrentUserChallengeStatusView(
+		CurrentUserChallengeStatus status
+	) {
+		return new CurrentUserChallengeStatusView(
+			status.challengeId(),
+			status.challengeDate(),
+			status.status(),
+			status.hasPlayedCurrentChallenge(),
+			status.hasActiveSession(),
+			status.activeSessionId(),
+			status.canStartSession(),
+			status.canResumeSession(),
+			status.leaderboardEligible(),
+			status.remainingLives(),
+			status.maxLives(),
+			status.finishedOutcome(),
+			status.sessionId()
 		);
 	}
 

@@ -103,6 +103,151 @@ class GameSessionApiIntegrationTest {
 	}
 
 	@Test
+	void currentChallengeStatusRequiresAuthentication() throws Exception {
+		mockMvc.perform(get("/api/challenges/current/status"))
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void currentChallengeStatusReturnsNotPlayedWhenTheUserHasNoSession() throws Exception {
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.challengeId").exists())
+			.andExpect(jsonPath("$.challengeDate").exists())
+			.andExpect(jsonPath("$.status", is("NOT_PLAYED")))
+			.andExpect(jsonPath("$.hasPlayedCurrentChallenge", is(false)))
+			.andExpect(jsonPath("$.hasActiveSession", is(false)))
+			.andExpect(jsonPath("$.canStartSession", is(true)))
+			.andExpect(jsonPath("$.canResumeSession", is(false)))
+			.andExpect(jsonPath("$.leaderboardEligible", is(false)))
+			.andExpect(jsonPath("$.activeSessionId").doesNotExist())
+			.andExpect(jsonPath("$.sessionId").doesNotExist())
+			.andExpect(jsonPath("$.remainingLives").doesNotExist())
+			.andExpect(jsonPath("$.maxLives").doesNotExist())
+			.andExpect(jsonPath("$.finishedOutcome").doesNotExist());
+	}
+
+	@Test
+	void currentChallengeStatusReturnsInProgressWhenTheUserHasAnActiveSession() throws Exception {
+		String sessionId = createSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status", is("IN_PROGRESS")))
+			.andExpect(jsonPath("$.hasPlayedCurrentChallenge", is(true)))
+			.andExpect(jsonPath("$.hasActiveSession", is(true)))
+			.andExpect(jsonPath("$.activeSessionId", is(sessionId)))
+			.andExpect(jsonPath("$.sessionId", is(sessionId)))
+			.andExpect(jsonPath("$.canStartSession", is(false)))
+			.andExpect(jsonPath("$.canResumeSession", is(true)))
+			.andExpect(jsonPath("$.leaderboardEligible", is(true)))
+			.andExpect(jsonPath("$.remainingLives", is(3)))
+			.andExpect(jsonPath("$.maxLives", is(3)))
+			.andExpect(jsonPath("$.finishedOutcome").doesNotExist());
+	}
+
+	@Test
+	void currentChallengeStatusReturnsWonWhenTheRelevantSessionWasWon() throws Exception {
+		String sessionId = createWonSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status", is("WON")))
+			.andExpect(jsonPath("$.hasPlayedCurrentChallenge", is(true)))
+			.andExpect(jsonPath("$.hasActiveSession", is(false)))
+			.andExpect(jsonPath("$.activeSessionId").doesNotExist())
+			.andExpect(jsonPath("$.sessionId", is(sessionId)))
+			.andExpect(jsonPath("$.canStartSession", is(false)))
+			.andExpect(jsonPath("$.canResumeSession", is(false)))
+			.andExpect(jsonPath("$.leaderboardEligible", is(true)))
+			.andExpect(jsonPath("$.remainingLives", is(3)))
+			.andExpect(jsonPath("$.maxLives", is(3)))
+			.andExpect(jsonPath("$.finishedOutcome", is("WON")));
+	}
+
+	@Test
+	void currentChallengeStatusReturnsLostWhenTheRelevantSessionWasLost() throws Exception {
+		String sessionId = createLostSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status", is("LOST")))
+			.andExpect(jsonPath("$.hasPlayedCurrentChallenge", is(true)))
+			.andExpect(jsonPath("$.hasActiveSession", is(false)))
+			.andExpect(jsonPath("$.activeSessionId").doesNotExist())
+			.andExpect(jsonPath("$.sessionId", is(sessionId)))
+			.andExpect(jsonPath("$.canStartSession", is(false)))
+			.andExpect(jsonPath("$.canResumeSession", is(false)))
+			.andExpect(jsonPath("$.leaderboardEligible", is(false)))
+			.andExpect(jsonPath("$.remainingLives", is(0)))
+			.andExpect(jsonPath("$.maxLives", is(3)))
+			.andExpect(jsonPath("$.finishedOutcome", is("LOST")));
+	}
+
+	@Test
+	void currentChallengeStatusOnlyReturnsActiveSessionIdForActiveSessions() throws Exception {
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.activeSessionId").doesNotExist());
+
+		String activeSessionId = createSession("alice");
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.activeSessionId", is(activeSessionId)));
+
+		createLostSession("bob");
+		mockMvc.perform(get("/api/challenges/current/status").with(user("bob")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.activeSessionId").doesNotExist());
+	}
+
+	@Test
+	void currentChallengeStatusDerivesCanStartSessionOnlyForNotPlayed() throws Exception {
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.canStartSession", is(true)));
+
+		createSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.canStartSession", is(false)));
+	}
+
+	@Test
+	void currentChallengeStatusDerivesCanResumeSessionOnlyForInProgress() throws Exception {
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.canResumeSession", is(false)));
+
+		String sessionId = createSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.sessionId", is(sessionId)))
+			.andExpect(jsonPath("$.canResumeSession", is(true)));
+
+		createLostSession("bob");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("bob")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.canResumeSession", is(false)));
+	}
+
+	@Test
+	void currentChallengeStatusDoesNotExposeBoardSnapshotOrInternalBoardData() throws Exception {
+		createSession("alice");
+
+		mockMvc.perform(get("/api/challenges/current/status").with(user("alice")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.board").doesNotExist())
+			.andExpect(jsonPath("$.boardSnapshot").doesNotExist())
+			.andExpect(jsonPath("$.cells").doesNotExist())
+			.andExpect(jsonPath("$.internalSeed").doesNotExist())
+			.andExpect(jsonPath("$.minePositions").doesNotExist());
+	}
+
+	@Test
 	void sessionByIdOnlyReturnsSessionsOwnedByTheAuthenticatedUser() throws Exception {
 		MvcResult createdSession = mockMvc.perform(post("/api/challenges/current/sessions").with(user("alice")))
 			.andExpect(status().isCreated())
@@ -281,6 +426,27 @@ class GameSessionApiIntegrationTest {
 		reveal(sessionId, mines.get(0), userId).andExpect(status().isOk());
 		reveal(sessionId, mines.get(1), userId).andExpect(status().isOk());
 		reveal(sessionId, mines.get(2), userId).andExpect(status().isOk());
+		return sessionId;
+	}
+
+	private String createWonSession(String userId) throws Exception {
+		String sessionId = createSession(userId);
+		ChallengeBoard board = realBoard(sessionId);
+
+		for (int row = 0; row < board.rows(); row++) {
+			for (int col = 0; col < board.cols(); col++) {
+				GameSession session = session(sessionId);
+				if (session.getStatus() == GameSessionStatus.WON) {
+					return sessionId;
+				}
+				CellCoordinate cell = new CellCoordinate(row, col);
+				if (!board.hasMine(row, col) && cellState(session, cell) == CellState.HIDDEN) {
+					reveal(sessionId, cell, userId).andExpect(status().isOk());
+				}
+			}
+		}
+
+		assertThat(session(sessionId).getStatus()).isEqualTo(GameSessionStatus.WON);
 		return sessionId;
 	}
 

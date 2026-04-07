@@ -19,4 +19,9 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
 		GameSessionStatus status
 	);
 
+	Optional<GameSession> findFirstByUserIdAndChallengeChallengeIdOrderByStartedAtAscSessionIdAsc(
+		String userId,
+		String challengeId
+	);
+
 }

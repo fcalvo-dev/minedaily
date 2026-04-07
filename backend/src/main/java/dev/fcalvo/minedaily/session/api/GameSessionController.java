@@ -1,9 +1,11 @@
 package dev.fcalvo.minedaily.session.api;
 
+import dev.fcalvo.minedaily.session.api.dto.CurrentUserChallengeStatusView;
 import dev.fcalvo.minedaily.session.api.dto.GameSessionView;
 import dev.fcalvo.minedaily.session.api.dto.SessionActionRequest;
 import dev.fcalvo.minedaily.session.api.dto.SessionActionResponse;
 import dev.fcalvo.minedaily.session.application.CreateSessionResult;
+import dev.fcalvo.minedaily.session.application.CurrentUserChallengeStatusService;
 import dev.fcalvo.minedaily.session.application.GameSessionService;
 import dev.fcalvo.minedaily.session.config.SessionApiMapper;
 import java.security.Principal;
@@ -20,14 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 /**
- * Exposes only the session lifecycle endpoints needed before gameplay exists.
+ * Exposes current-user session status, session lifecycle, and gameplay action endpoints.
  */
 public class GameSessionController {
 
 	private final GameSessionService gameSessionService;
+	private final CurrentUserChallengeStatusService currentUserChallengeStatusService;
 
-	public GameSessionController(GameSessionService gameSessionService) {
+	public GameSessionController(
+		GameSessionService gameSessionService,
+		CurrentUserChallengeStatusService currentUserChallengeStatusService
+	) {
 		this.gameSessionService = gameSessionService;
+		this.currentUserChallengeStatusService = currentUserChallengeStatusService;
+	}
+
+	@GetMapping("/challenges/current/status")
+	public CurrentUserChallengeStatusView getCurrentUserChallengeStatus(Principal principal) {
+		return SessionApiMapper.toCurrentUserChallengeStatusView(
+			currentUserChallengeStatusService.getCurrentUserChallengeStatus(principal.getName())
+		);
 	}
 
 	@PostMapping("/challenges/current/sessions")

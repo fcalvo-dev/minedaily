@@ -2,6 +2,7 @@ package dev.fcalvo.minedaily.session.infrastructure;
 
 import dev.fcalvo.minedaily.session.domain.GameSession;
 import dev.fcalvo.minedaily.session.domain.GameSessionStatus;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +24,7 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
 		String userId,
 		String challengeId
 	);
+
+	List<GameSession> findByChallengeChallengeIdOrderByUserIdAscStartedAtAscSessionIdAsc(String challengeId);
 
 }

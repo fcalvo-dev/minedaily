@@ -1,0 +1,64 @@
+{
+  "properties": [
+    {
+      "name": "minedaily.challenge.timezone",
+      "type": "java.lang.String",
+      "description": "Official business timezone used to resolve daily challenge windows."
+    },
+    {
+      "name": "minedaily.challenge.rollover-hour",
+      "type": "java.lang.Integer",
+      "description": "Local hour in the official timezone when the daily challenge rolls over."
+    },
+    {
+      "name": "minedaily.challenge.rollover-cron",
+      "type": "java.lang.String",
+      "description": "Cron expression for scheduled current challenge provisioning."
+    },
+    {
+      "name": "minedaily.challenge.rows",
+      "type": "java.lang.Integer",
+      "description": "Number of rows in the daily challenge board."
+    },
+    {
+      "name": "minedaily.challenge.cols",
+      "type": "java.lang.Integer",
+      "description": "Number of columns in the daily challenge board."
+    },
+    {
+      "name": "minedaily.challenge.mine-count",
+      "type": "java.lang.Integer",
+      "description": "Number of mines in the daily challenge board."
+    },
+    {
+      "name": "minedaily.challenge.generator-version",
+      "type": "java.lang.String",
+      "description": "Version label for deterministic board generation."
+    },
+    {
+      "name": "minedaily.challenge.seed-namespace",
+      "type": "java.lang.String",
+      "description": "Namespace included in deterministic internal seed derivation."
+    },
+    {
+      "name": "minedaily.dev.endpoints.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables internal development endpoints."
+    },
+    {
+      "name": "minedaily.dev.user.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables the temporary in-memory development user."
+    },
+    {
+      "name": "minedaily.dev.user.username",
+      "type": "java.lang.String",
+      "description": "Username for the temporary in-memory development user."
+    },
+    {
+      "name": "minedaily.dev.user.password",
+      "type": "java.lang.String",
+      "description": "Password for the temporary in-memory development user."
+    }
+  ]
+}

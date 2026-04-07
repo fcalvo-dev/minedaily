@@ -1,6 +1,8 @@
 package dev.fcalvo.minedaily.session.config;
 
 import dev.fcalvo.minedaily.session.api.dto.GameSessionView;
+import dev.fcalvo.minedaily.session.api.dto.SessionActionResponse;
+import dev.fcalvo.minedaily.session.application.SessionActionResult;
 import dev.fcalvo.minedaily.session.domain.BoardCellSnapshot;
 import dev.fcalvo.minedaily.session.domain.BoardSnapshot;
 import dev.fcalvo.minedaily.session.domain.GameSession;
@@ -25,6 +27,18 @@ public final class SessionApiMapper {
 			new GameSessionView.LivesView(session.getMaxLives(), session.getRemainingLives()),
 			new GameSessionView.PerformanceView(session.getErrorCount(), session.getClickCount()),
 			toBoardSnapshotView(session.getBoardSnapshot())
+		);
+	}
+
+	public static SessionActionResponse toSessionActionResponse(SessionActionResult result) {
+		return new SessionActionResponse(
+			new SessionActionResponse.ActionView(
+				result.actionType(),
+				result.row(),
+				result.col(),
+				result.result()
+			),
+			toGameSessionView(result.session())
 		);
 	}
 

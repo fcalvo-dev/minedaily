@@ -1,6 +1,8 @@
 package dev.fcalvo.minedaily.session.api;
 
 import dev.fcalvo.minedaily.session.api.dto.GameSessionView;
+import dev.fcalvo.minedaily.session.api.dto.SessionActionRequest;
+import dev.fcalvo.minedaily.session.api.dto.SessionActionResponse;
 import dev.fcalvo.minedaily.session.application.CreateSessionResult;
 import dev.fcalvo.minedaily.session.application.GameSessionService;
 import dev.fcalvo.minedaily.session.config.SessionApiMapper;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +50,28 @@ public class GameSessionController {
 	public GameSessionView getSession(@PathVariable String sessionId, Principal principal) {
 		return SessionApiMapper.toGameSessionView(
 			gameSessionService.getOwnedSession(sessionId, principal.getName())
+		);
+	}
+
+	@PostMapping("/sessions/{sessionId}/actions/reveal")
+	public SessionActionResponse reveal(
+		@PathVariable String sessionId,
+		@RequestBody SessionActionRequest request,
+		Principal principal
+	) {
+		return SessionApiMapper.toSessionActionResponse(
+			gameSessionService.reveal(sessionId, principal.getName(), request.row(), request.col())
+		);
+	}
+
+	@PostMapping("/sessions/{sessionId}/actions/toggle-flag")
+	public SessionActionResponse toggleFlag(
+		@PathVariable String sessionId,
+		@RequestBody SessionActionRequest request,
+		Principal principal
+	) {
+		return SessionApiMapper.toSessionActionResponse(
+			gameSessionService.toggleFlag(sessionId, principal.getName(), request.row(), request.col())
 		);
 	}
 

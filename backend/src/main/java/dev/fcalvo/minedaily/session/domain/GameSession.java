@@ -170,4 +170,21 @@ public class GameSession {
 		return boardSnapshot;
 	}
 
+	public void applyGameplayUpdate(
+		BoardSnapshot boardSnapshot,
+		int remainingLives,
+		int errorCount,
+		int clickCount,
+		GameSessionStatus status,
+		OffsetDateTime endedAt
+	) {
+		this.boardSnapshot = boardSnapshot;
+		this.remainingLives = remainingLives;
+		this.errorCount = errorCount;
+		this.clickCount = clickCount;
+		this.status = status;
+		this.endedAt = endedAt;
+		syncActiveSessionKey();
+	}
+
 }
